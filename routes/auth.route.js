@@ -4,7 +4,6 @@ const verifyToken = require('../middlewares/verifyToken');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const User = require('../models/user');
-const { append } = require('express/lib/response');
 const sendEmail =  require('../send-mail.js');
 dotenv.config();
 

@@ -21,6 +21,14 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    shoppingCard: {
+        type: Array,
+        default: []
+    },
+    order: {
+        type: Array,
+        default: []
+    }
 });
 
 const User = module.exports = mongoose.model('User', userSchema);

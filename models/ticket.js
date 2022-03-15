@@ -8,11 +8,11 @@ const userSchema = mongoose.Schema({
     },
     description: {
         type: String,
-        required: true
+        //required: true
     },
     eventDate: {
         type: Date,
-        required: true
+        //required: true
     },
     price: {
         type: Number,
@@ -20,15 +20,21 @@ const userSchema = mongoose.Schema({
     },
     quantity: {
         type: Number,
-        required: true
+        //required: true
     },
     cancelDeadline: {
         type: Date,
-        required: true
+        //required: true
     },
     allowedCountries: {
         type: String,
-        required: true
+        //required: true
+    },
+    isSold: {
+        type: Boolean
+    },
+    owner: {
+        type: mongoose.Schema.Types.ObjectId, ref: 'User'
     }
 });
 

@@ -6,10 +6,16 @@ async function verifyToken(req,res,next){
     if(typeof bearerHeader !== 'undefined'){
         const bearer = bearerHeader.split(' ');
         const bearerToken = bearer[1];
-        const {userId} = await jwt.verify(bearerToken, process.env.SECRET);
-        const user = await User.findById(userId).exec();
-        req.user = user
-        next();
+        try{
+            const {userId} = await jwt.verify(bearerToken, process.env.SECRET);
+            const user = await User.findById(userId).exec();
+            req.user = user
+            next();
+        }catch(err){
+            res.json({
+                msg: "Account is not logged in"
+            })
+        }
     }else{
         res.sendStatus(403);
     }
