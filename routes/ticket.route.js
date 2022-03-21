@@ -82,7 +82,7 @@ router.get('/search',verifyToken, async (req,res)=>{
                 "$regex": req.user.country,
                 "$options": "i" 
             }
-        }).sort(query).limit(LIMIT).skip(startIndex)
+        }).populate('comments').sort(query).limit(LIMIT).skip(startIndex)
         res.status(200).json({ data: tickets, currentPage: Number(page), numberOfPages: Math.ceil(total / LIMIT) });
     }catch(error){
         res.json({
@@ -117,6 +117,45 @@ router.patch('/:id/addToCart',verifyToken, async (req,res)=>{
     }
 })
 
+//Cancel a ticket from shopping cart
+router.patch('/:id/cancelFromCart',verifyToken, async (req,res)=>{
+    try{
+        const { id } = req.params;
+        const isFound = await User.find({ "shoppingCart": { "$in": [id] } })
+        console.log(isFound)
+        if(isFound.length === 0){
+            return res.status(400).send('You don`t have this ticket in your shopping cart');
+        }
+        const ticket = await Ticket.findById(id);
+        if(ticket.canCancel && ticket.cancelDate > Date.now()){      
+            ticket.quantity += 1;
+            ticket.save();
+            
+            req.user.balance += ticket.price;
+            req.user.shoppingCart = req.user.shoppingCart.filter(item => item._id.toString() !== id);
+            req.user.save();
+            console.log(req.user.balance)  
+            res.json(ticket);     
+        }
+        else{
+            return res.status(400).send('You can`t cancel this ticket');
+        }
+
+    } catch(error){
+        res.status(404).send('No product with that id');
+    }
+});
+
+//Show shopping cart
+router.get('/cart',verifyToken, async (req,res)=>{
+    try{
+        const shoppingCart = req.user.shoppingCart;
+        res.json(shoppingCart);
+    }
+    catch(error){
+        res.status(404).send('No product with that id');
+    }
+})
     
 
 module.exports = router;

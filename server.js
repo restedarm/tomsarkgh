@@ -32,3 +32,5 @@ app.listen(3000, () => {
 
 
 
+// res.setHeader('Authorization', 'Bearer '+ token); 
+// res.header('Authorization', 'Bearer '+ token);

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-// User Schema
+
 const userSchema = mongoose.Schema({
     email: {
         type: String,
@@ -27,10 +27,6 @@ const userSchema = mongoose.Schema({
         ref: 'Ticket'
         }
     ],
-    // order: {
-    //     type: Array,
-    //     default: []
-    // }
 });
 
 const User = module.exports = mongoose.model('User', userSchema);

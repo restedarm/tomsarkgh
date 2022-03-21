@@ -28,7 +28,7 @@ async function verifyToken(req,res,next){
 async function checkTicketOwnership(req,res,next){
     try{
         const ticket = await Ticket.findById(req.params.id);
-        if(ticket.owner.id.toString() !== req.user._id.toString()){
+        if(ticket.author.id.toString() !== req.user._id.toString()){
             res.json({
                 msg: "You dont have permission to do that"
             })

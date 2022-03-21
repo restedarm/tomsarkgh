@@ -20,24 +20,24 @@ const userSchema = mongoose.Schema({
     },
     quantity: {
         type: Number,
-        //required: true
+        default: 1
     },
     canCancel: {
         type: Boolean,
-        //required: true
+        default: true
     },
-    cancelDeadline: {
+    cancelDate: {
         type: Date,
-        //required: true
+        required: true
     },
     allowedCountries: {
         type: String,
         //required: true
     },
-    // isSold: {
-    //     type: Boolean
-    // },
-    owner: {
+    isSold: {
+        type: Boolean
+    },
+    author: {
         id:{
             type: mongoose.Schema.Types.ObjectId, 
             ref: 'User',
