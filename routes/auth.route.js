@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const router = Router();
-const verifyToken = require('../middlewares/verifyToken');
+const { verifyToken } = require('../middlewares/verifyToken');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const User = require('../models/user');
@@ -29,12 +29,14 @@ router.post('/api/users',async(req,res) => {
     user.email = req.body.email;
     user.password = req.body.password;
     user.country = req.body.country;
+    console.log(user)
     const savedUser = await user.save()
     const token = await jwt.sign({userId:user._id}, process.env.SECRET)
     const emailResponse = await sendEmail({to:user.email,
         text:`Please click to the link http://localhost:3000/auth/emailVerify?token=${token}`})
     console.log('emailResponse', emailResponse)
     res.json({
+        msg: "Please check your email",
         id: savedUser._id
     })
 })

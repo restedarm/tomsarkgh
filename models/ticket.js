@@ -22,6 +22,10 @@ const userSchema = mongoose.Schema({
         type: Number,
         //required: true
     },
+    canCancel: {
+        type: Boolean,
+        //required: true
+    },
     cancelDeadline: {
         type: Date,
         //required: true
@@ -30,12 +34,23 @@ const userSchema = mongoose.Schema({
         type: String,
         //required: true
     },
-    isSold: {
-        type: Boolean
-    },
+    // isSold: {
+    //     type: Boolean
+    // },
     owner: {
-        type: mongoose.Schema.Types.ObjectId, ref: 'User'
-    }
+        id:{
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'User',
+        },
+       // username: String
+    },
+    comments: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Comment'
+        },
+    ],
+    
 });
 
 const Ticket = module.exports = mongoose.model('Ticket', userSchema);

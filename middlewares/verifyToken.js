@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const Ticket = require('../models/ticket');
 const User = require('../models/user');
 
 async function verifyToken(req,res,next){
@@ -10,6 +11,9 @@ async function verifyToken(req,res,next){
             const {userId} = await jwt.verify(bearerToken, process.env.SECRET);
             const user = await User.findById(userId).exec();
             req.user = user
+            // res.json({
+            //     userId: user._id
+            // })
             next();
         }catch(err){
             res.json({
@@ -21,4 +25,33 @@ async function verifyToken(req,res,next){
     }
 }
 
-module.exports = verifyToken;
+async function checkTicketOwnership(req,res,next){
+    try{
+        const ticket = await Ticket.findById(req.params.id);
+        if(ticket.owner.id.toString() !== req.user._id.toString()){
+            res.json({
+                msg: "You dont have permission to do that"
+            })
+        }else{
+            next();
+        }
+    }catch(error){
+        res.json({
+            msg: "Ticket not found"
+        })
+    }
+}
+
+  
+
+function parse(str,ord){
+    console.log("funkcia mtel enq")
+    if(str === "price"){
+        return { price : Number(ord)}
+    }
+
+}
+
+
+
+module.exports = {verifyToken,parse,checkTicketOwnership}

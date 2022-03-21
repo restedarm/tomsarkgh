@@ -13,22 +13,24 @@ const userSchema = mongoose.Schema({
     verified: {
         type: Boolean
     },
-    coins: {
+    balance: {
         type: Number,
         default: 1000
     },
     country: {
         type: String,
-        required: true
+       // required: true
     },
-    shoppingCard: {
-        type: Array,
-        default: []
-    },
-    order: {
-        type: Array,
-        default: []
-    }
+    shoppingCart: [
+        {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Ticket'
+        }
+    ],
+    // order: {
+    //     type: Array,
+    //     default: []
+    // }
 });
 
 const User = module.exports = mongoose.model('User', userSchema);
