@@ -2,9 +2,13 @@ const mongoose = require('mongoose');
 
 
 const userSchema = mongoose.Schema({
+    username: {
+        type: String,
+      //  required: true
+    },
     email: {
         type: String,
-        required: true
+        required: true,
     },
     password: {
         type: String,
@@ -25,6 +29,12 @@ const userSchema = mongoose.Schema({
         {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Ticket'
+        }
+    ],
+    orders: [
+        {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Order'
         }
     ],
 });

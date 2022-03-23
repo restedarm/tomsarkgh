@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const router = Router();
 const { verifyToken, parse, checkTicketOwnership } = require('../middlewares/verifyToken');
+const { ticketValidator } = require('../middlewares/validator');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const User = require('../models/user');
@@ -11,7 +12,7 @@ const user = require("../models/user");
 dotenv.config();
 
 //Create a ticket 
-router.post('/',verifyToken,async (req,res)=>{
+router.post('/',verifyToken,ticketValidator,async (req,res)=>{
     const ticket = req.body;
     ticket.owner = req.user._id;
     ticket.isSold = false;
@@ -94,19 +95,17 @@ router.get('/search',verifyToken, async (req,res)=>{
 //Add a ticket to shopping cart
 router.patch('/:id/addToCart',verifyToken, async (req,res)=>{
     try{
+       // req.user.balance = 1000;
         const { id } = req.params;
         const ticket = await Ticket.findById(id);
         if(ticket.quantity === 0){
             return res.status(400).send('No available tickets');
         }
-        if(ticket.price > req.user.balance){
-            return res.status(400).send('You don`t have enough money');
-        }
+    
         ticket.quantity -= 1;
         ticket.owner = req.user._id;
         ticket.save();
-        
-        req.user.balance -= ticket.price;
+
         req.user.shoppingCart.push(ticket);
         req.user.save();
         
@@ -131,7 +130,7 @@ router.patch('/:id/cancelFromCart',verifyToken, async (req,res)=>{
             ticket.quantity += 1;
             ticket.save();
             
-            req.user.balance += ticket.price;
+          //  req.user.balance += ticket.price;
             req.user.shoppingCart = req.user.shoppingCart.filter(item => item._id.toString() !== id);
             req.user.save();
             console.log(req.user.balance)  

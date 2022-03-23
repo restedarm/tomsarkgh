@@ -2,11 +2,9 @@ const { Router } = require('express');
 const router = Router();
 const { verifyToken } = require('../middlewares/verifyToken');
 const dotenv = require('dotenv');
-const User = require('../models/user');
+
 const Ticket = require('../models/ticket');
 const Comment = require('../models/comment');
-const ticket = require('../models/ticket');
-const comment = require('../models/comment');
 
 dotenv.config();
 

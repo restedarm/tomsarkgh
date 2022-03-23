@@ -4,11 +4,15 @@ const User = require('../models/user');
 
 async function verifyToken(req,res,next){
     const bearerHeader = req.headers['authorization'];
+    console.log(req.headers['authorization'])
     if(typeof bearerHeader !== 'undefined'){
         const bearer = bearerHeader.split(' ');
+        console.log(bearer)
         const bearerToken = bearer[1];
+        console.log(typeof(bearerToken))
         try{
             const {userId} = await jwt.verify(bearerToken, process.env.SECRET);
+            console.log(userId)
             const user = await User.findById(userId).exec();
             req.user = user
             // res.json({
