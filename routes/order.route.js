@@ -65,31 +65,19 @@ router.patch('/:id/cancel',verifyToken, async (req,res)=>{
         }
         const dbTickets = await Ticket.find({ "_id": { "$in": order.tickets.map(t => t._id) } });
         const activeTickets = dbTickets.filter(ticket => ticket.canCancel && ticket.cancelDate > Date.now())
+        if(activeTickets.length === 0){
+            return res.status(400).send('You can`t cancel this order');
+        }
         price = activeTickets.reduce((acc, ticket) => acc + ticket.price, 0);
         const savePromises = dbTickets.map(t => {
             t.quantity += 1;
+            t.isSold = false;
             return t.save()
         })
         await Promise.all(savePromises)
         req.user.balance += price;
         req.user.save();
-
-        for(let i = 0; i < order.tickets.length; i++){
-            var ticket = await Ticket.findById(order.tickets[i]._id);
-            if(ticket.canCancel && ticket.cancelDate > Date.now()){      
-                ticket.quantity += 1;
-                price += ticket.price;
-            }
-            
-            else{
-                return res.status(400).send('You can`t cancel this ticket');
-            }
-            ticket.isSold = false;
-            ticket.save();
-        }
-        
-        req.user.balance += ticket.price;
-        req.user.save();
+    
         order.remove();
         res.json(order);
     } catch(error){
