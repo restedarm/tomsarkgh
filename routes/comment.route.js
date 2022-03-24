@@ -29,6 +29,7 @@ router.post('/:id', verifyToken, async (req, res) => {
         const comment = new Comment();
         comment.text = req.body.comment;
         comment.author.id = req.user._id;
+        comment.author.username = req.user.username;
         comment.save()
 
         ticket.comments.push(comment);

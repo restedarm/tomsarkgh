@@ -51,3 +51,5 @@ exports.loginValidator = [
     body('canCancel', 'Can cancel is required').isBoolean(),
     valErrorHandler
   ]
+
+  
