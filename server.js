@@ -8,7 +8,7 @@ dotenv.config();
 
 const app = express();
 
-mongoose.connect('mongodb://localhost/jsw_test');
+mongoose.connect(process.env.MONGO_URL);
 const db = mongoose.connection;
 
 // Requiring Routers
@@ -32,7 +32,7 @@ app.use('/order',orderRouter);
 
 
 
-app.listen(3000, () => {
+app.listen(process.env.PORT, () => {
     console.log("Server started on port 3000");
 });
 
