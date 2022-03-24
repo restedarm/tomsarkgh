@@ -15,21 +15,17 @@ router.post('/', verifyToken, async (req, res) => {
     const order = new Order();
     order.tickets = tickets;
     order.owner = req.user.id;
-    console.log(tickets);
     order.save()
-
-    let tick
-    let price=0;
-    for (let i = 0; i < tickets.length; i++) {
-        tick = await Ticket.findById(tickets[i]._id);
-        console.log(tick.price + " ticket price ")
-        price += tick.price;
-    }
-    console.log(price);
+    const dbTickets = await Ticket.find({ "_id": { "$in": tickets.map(t => t._id) } });
+    const price = dbTickets.reduce((acc, ticket) => acc + ticket.price, 0);
     if (price > req.user.balance) {
         return res.status(400).send('You don`t have enough money');
     }
-    console.log(typeof(req.user.balance))
+    const savePromises = dbTickets.map(t => {
+        t.isSold = true;
+        return t.save()
+    })
+    await Promise.all(savePromises)
     req.user.balance -= price;
     req.user.orders.push(order);
     req.user.shoppingCart = [];
@@ -67,6 +63,17 @@ router.patch('/:id/cancel',verifyToken, async (req,res)=>{
         if(order.owner.toString() !== req.user._id.toString()){
             return res.status(400).send('You don`t have this order');
         }
+        const dbTickets = await Ticket.find({ "_id": { "$in": order.tickets.map(t => t._id) } });
+        const activeTickets = dbTickets.filter(ticket => ticket.canCancel && ticket.cancelDate > Date.now())
+        price = activeTickets.reduce((acc, ticket) => acc + ticket.price, 0);
+        const savePromises = dbTickets.map(t => {
+            t.quantity += 1;
+            return t.save()
+        })
+        await Promise.all(savePromises)
+        req.user.balance += price;
+        req.user.save();
+
         for(let i = 0; i < order.tickets.length; i++){
             var ticket = await Ticket.findById(order.tickets[i]._id);
             if(ticket.canCancel && ticket.cancelDate > Date.now()){      
@@ -77,6 +84,7 @@ router.patch('/:id/cancel',verifyToken, async (req,res)=>{
             else{
                 return res.status(400).send('You can`t cancel this ticket');
             }
+            ticket.isSold = false;
             ticket.save();
         }
         

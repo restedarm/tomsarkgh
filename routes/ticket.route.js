@@ -14,11 +14,10 @@ dotenv.config();
 //Create a ticket 
 router.post('/',verifyToken,ticketValidator,async (req,res)=>{
     const ticket = req.body;
-    ticket.owner = req.user._id;
     ticket.isSold = false;
 
     try {
-        const newTicket = await Ticket.create({...ticket, owner: {id:req.user._id}});
+        const newTicket = await Ticket.create({...ticket, author: {id:req.user._id}});
         console.log(newTicket.owner)
         res.status(201).json(newTicket);
     } catch(error){
@@ -29,6 +28,7 @@ router.post('/',verifyToken,ticketValidator,async (req,res)=>{
 //Delete a ticket by name
 
 router.delete('/:id',verifyToken,checkTicketOwnership, async (req,res)=>{
+    console.log("mtanq")
     if(req.body.isSold){
         return res.status(400).send('You can`t delete a sold ticket');
     }
@@ -49,15 +49,24 @@ router.patch('/:id',verifyToken,checkTicketOwnership, async (req,res)=>{
     }
     try{
         const { id } = req.params;
+        const { name, description, price, eventDate, cancelDate, quantity, canCancel } = req.body;
         const ticket = req.body;
 
+        if( name ) ticket.name = name;
+        if( description ) ticket.description = description;
+        if( price ) ticket.price = price;
+        if( eventDate ) ticket.eventDate = eventDate;
+        if( cancelDate ) ticket.cancelDate = cancelDate;
+        if( quantity ) ticket.quantity = quantity;
+        if( canCancel ) ticket.canCancel = canCancel;
         if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).send('No product with that id');
-        const updatedTicket = await Ticket.findByIdAndUpdate(id, { ...ticket, _id: id }, { new: true });
-        res.json(updatedTicket);
+        await Ticket.findByIdAndUpdate(id,ticket);
+        res.json({message :'Product updated successfully'});
     } catch(error){
         res.status(404).send('No product with that id');
     }
-})
+});
+
 
 // Find all tickets filtered by atributes and sorted by users choice
 router.get('/search',verifyToken, async (req,res)=>{ 
@@ -83,7 +92,7 @@ router.get('/search',verifyToken, async (req,res)=>{
                 "$regex": req.user.country,
                 "$options": "i" 
             }
-        }).populate('comments').sort(query).limit(LIMIT).skip(startIndex)
+        }).populate('comments','text').sort(query).limit(LIMIT).skip(startIndex)
         res.status(200).json({ data: tickets, currentPage: Number(page), numberOfPages: Math.ceil(total / LIMIT) });
     }catch(error){
         res.json({

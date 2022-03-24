@@ -49,7 +49,15 @@ function parse(str,ord){
     if(str === "price"){
         return { price : Number(ord)}
     }
-
+    else if(str === "quantity"){
+        return { quantity : Number(ord)}
+    }
+    else if(str === "cancelDate"){
+        return { cancelDate : Number(ord)}
+    }
+    else if(str === "eventDate"){
+        return { eventDate : Number(ord)}
+    }
 }
 
 
