@@ -94,6 +94,10 @@ router.get('/api/profile', verifyToken, (req,res) => {
     res.json(req.user);
 });
 
+router.get('/api', (req, res) => {
+    res.json({message: 'Welcome to the API'});
+})
+
 module.exports = router;
 
 
