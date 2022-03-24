@@ -6,7 +6,7 @@ exports.registerValidator = [
     body('email', 'Email is not in a right form').isEmail(),
     body('password', 'Password will be minimum 5 chars').isLength({ min: 5 }),
     body('country', 'Country is required').isIn( countryList ),
-    body('username', 'Username will be name and surname ').matches(/^[A-Za-z]+\s*[A-Za-z]+$/g), // ???
+    body('username', 'Username should be name and surname '),
     valErrorHandler,
 ]
 
