@@ -45,7 +45,7 @@ router.post('/api/users',registerValidator,async(req,res) => {
         const savedUser = await user.save()
         const token = await jwt.sign({userId:user._id}, process.env.SECRET)
         const emailResponse = await sendEmail({to:user.email,
-            text:`Please click to the link http://localhost:3000/auth/emailVerify?token=${token}`})
+            text:`Please click to the link ${process.env.APP_URL}/auth/emailVerify?token=${token}`})
     // console.log('emailResponse', emailResponse)
         res.json({
             msg: "Please check your email",
