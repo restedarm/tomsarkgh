@@ -164,6 +164,55 @@ router.get('/cart',verifyToken, async (req,res)=>{
         res.status(404).send('No product with that id');
     }
 })
+
+//Like a ticket
+router.patch('/:id/like',verifyToken, async (req,res)=>{
+    try{
+        const { id } = req.params;
+        console.log(id)
+        const ticket = await Ticket.findById(id);
     
+        console.log(ticket.likedBy)
+        if(ticket.likedBy.includes(req.user._id)){
+            return res.status(400).send('You already liked this ticket');
+        }
+
+        if(ticket.dislikedBy.includes(req.user._id)){
+            ticket.dislikedBy.splice(ticket.dislikedBy.indexOf(req.user._id),1);
+            ticket.dislikes -= 1;
+        }
+
+        ticket.likedBy.push(req.user._id);
+        ticket.likes+=1
+
+        ticket.save();
+        res.json(ticket);
+    } catch(error){
+        res.status(404).send('No product with that id');
+    }
+});
+
+//Dislike a ticket
+router.patch('/:id/dislike',verifyToken, async (req,res)=>{
+    try{
+        const { id } = req.params;
+        const ticket = await Ticket.findById(id);
+    
+        if(ticket.dislikedBy.includes(req.user._id)){
+            return res.status(400).send('You already disliked this ticket');
+        }
+        if(ticket.likedBy.includes(req.user._id)){
+            ticket.likedBy.splice(ticket.likedBy.indexOf(req.user._id),1);
+            ticket.likes -= 1;
+        }
+        ticket.dislikedBy.push(req.user._id);
+        ticket.dislikes+=1;
+        ticket.save();
+        res.json(ticket);
+    } catch(error){
+        res.status(404).send('No product with that id');
+    }
+});
+
 
 module.exports = router;

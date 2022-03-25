@@ -32,7 +32,7 @@ const userSchema = mongoose.Schema({
     },
     allowedCountries: {
         type: String,
-        //required: true
+        required: true
     },
     isSold: {
         type: Boolean
@@ -50,6 +50,26 @@ const userSchema = mongoose.Schema({
             ref: 'Comment'
         },
     ],
+    likes: {
+        type: Number,
+        default: 0
+    },
+    dislikes: {
+        type: Number,
+        default: 0
+    },
+    likedBy: [   
+            {   
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+            },
+    ],
+    dislikedBy: [   
+        {type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        },
+    ],
+
     
 });
 

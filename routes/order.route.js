@@ -65,9 +65,12 @@ router.patch('/:id/cancel',verifyToken, async (req,res)=>{
         }
         const dbTickets = await Ticket.find({ "_id": { "$in": order.tickets.map(t => t._id) } });
         const activeTickets = dbTickets.filter(ticket => ticket.canCancel && ticket.cancelDate > Date.now())
+        order.tickets = dbTickets.filter(ticket => !ticket.canCancel || !ticket.cancelDate > Date.now())
+        
         if(activeTickets.length === 0){
             return res.status(400).send('You can`t cancel this order');
         }
+        
         price = activeTickets.reduce((acc, ticket) => acc + ticket.price, 0);
         const savePromises = dbTickets.map(t => {
             t.quantity += 1;
@@ -77,8 +80,12 @@ router.patch('/:id/cancel',verifyToken, async (req,res)=>{
         await Promise.all(savePromises)
         req.user.balance += price;
         req.user.save();
-    
-        order.remove();
+        
+        if(order.tickets.length === 0){
+            await order.remove();
+        }else{
+            order.save();
+        }
         res.json(order);
     } catch(error){
         res.status(404).send('No product with that id');
