@@ -2,7 +2,7 @@ const { body, validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
 const { countryList } = require('./countryList');
 
-exports.registerValidator = [
+const registerValidator = [
     body('email', 'Email is not in a right form').isEmail(),
     body('password', 'Password will be minimum 5 chars').isLength({ min: 5 }),
     body('country', 'Country is required').isIn( countryList ),
@@ -10,7 +10,7 @@ exports.registerValidator = [
     valErrorHandler,
 ]
 
-exports.loginValidator = [
+const loginValidator = [
     body('email').trim().isEmail().withMessage('email / password is required!'),
     body('password')
       .trim()
@@ -40,7 +40,7 @@ exports.loginValidator = [
         next();
   }
 
-  exports.ticketValidator = [
+  const ticketPostValidator = [
     body('name', 'Name is required').isLength({ min: 5 }),
     body('description', 'Description is required').isLength({ min: 5 }),
     body('price', 'Minimum price will be 100 coins').isNumeric().isInt({ min: 100 }),
@@ -52,4 +52,8 @@ exports.loginValidator = [
     valErrorHandler
   ]
 
+  const ticketPatchValidator = ticketPostValidator.map(item => item.optional());
+
+
+module.exports = { registerValidator, loginValidator, ticketPostValidator, ticketPatchValidator };
   
